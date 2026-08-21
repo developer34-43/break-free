@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Dashboard - Break Free</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <!-- ================= LOGIN VIEW ================= -->
+  <div class="login-wrap" id="loginView">
+    <form class="login-card" id="loginForm">
+      <svg width="46" height="46" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <circle cx="24" cy="24" r="22" fill="#dcfce7"/>
+        <path d="M24 38c-7-4.5-12-9.5-12-15.5C12 17 16 13.5 20.5 13.5c2 0 3.5 1 3.5 1s1.5-1 3.5-1C32 13.5 36 17 36 22.5c0 6-5 11-12 15.5z" fill="#16a34a"/>
+        <path d="M24 14.5v23M24 21l5-4M24 27l-5-4M24 32l6-5" stroke="#dcfce7" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h1>Break Free Admin</h1>
+      <p class="muted">Sign in to manage enquiries and support centres.</p>
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" required />
+      </div>
+
+      <span class="error-msg" id="loginError"></span>
+
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Login</button>
+      <a class="back-link" href="/">&larr; Back to website</a>
+    </form>
+  </div>
+
+  <!-- ================= DASHBOARD VIEW ================= -->
+  <div class="dashboard" id="dashView" hidden>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <strong>Break Free &middot; Admin</strong>
+        <div class="topbar-actions">
+          <a class="btn btn-outline btn-sm" href="/" target="_blank" rel="noopener">View Site</a>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dash-main">
+      <!-- Stats -->
+      <section class="stats-row" id="statsRow">
+        <div class="stat-card"><span class="stat-num" id="statRequests">-</span><span>Total Support Requests</span></div>
+        <div class="stat-card"><span class="stat-num" id="statNgos">-</span><span>Support Centres Listed</span></div>
+        <div class="stat-card"><span class="stat-num" id="statVerified">-</span><span>Verified Centres</span></div>
+      </section>
+
+      <!-- Tabs -->
+      <nav class="tabs" aria-label="Dashboard sections">
+        <button class="tab active" data-tab="enquiries">Enquiries</button>
+        <button class="tab" data-tab="ngos">Support Centres</button>
+      </nav>
+
+      <!-- Enquiries tab -->
+      <section class="tab-panel" id="tab-enquiries">
+        <div class="panel-head">
+          <h2>Support Requests <span class="count-pill" id="reqCount">0</span></h2>
+          <p class="muted small">Confidential - visible only to administrators.</p>
+        </div>
+        <div class="table-card table-scroll">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Name</th><th>Phone</th><th>Age/Gender</th><th>For</th><th>Addictions</th><th>Area</th><th></th></tr>
+            </thead>
+            <tbody id="requestsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- NGOs tab -->
+      <section class="tab-panel" id="tab-ngos" hidden>
+        <div class="panel-head">
+          <h2>Support Centres <span class="count-pill" id="ngoCount">0</span></h2>
+          <button class="btn btn-primary btn-sm" id="addNgoBtn">+ Add Centre</button>
+        </div>
+        <div class="table-card table-scroll">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Area</th><th>Phone</th><th>Pricing</th><th>Verified</th><th style="min-width:210px">Actions</th></tr>
+            </thead>
+            <tbody id="ngosBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- NGO add/edit modal -->
+  <div class="modal-overlay" id="ngoModal" role="dialog" aria-modal="true" aria-labelledby="ngoModalTitle">
+    <div class="modal modal-wide">
+      <button type="button" class="modal-close" id="ngoModalClose" aria-label="Close">&#10005;</button>
+      <h2 id="ngoModalTitle">Add Support Centre</h2>
+      <form id="ngoForm">
+        <input type="hidden" id="ngoId" />
+        <div class="form-grid">
+          <div class="field field-full">
+            <label for="fName">Name *</label>
+            <input type="text" id="fName" required maxlength="200" />
+          </div>
+          <div class="field field-full">
+            <label for="fShort">Short description (shown on cards)</label>
+            <input type="text" id="fShort" maxlength="300" />
+          </div>
+          <div class="field field-full">
+            <label for="fDesc">Full description</label>
+            <textarea id="fDesc" maxlength="1500"></textarea>
+          </div>
+          <div class="field field-full">
+            <label for="fAddress">Address</label>
+            <input type="text" id="fAddress" maxlength="300" />
+          </div>
+          <div class="field">
+            <label for="fArea">Area</label>
+            <input type="text" id="fArea" list="areaList" placeholder="e.g. Vesu" />
+            <datalist id="areaList"></datalist>
+          </div>
+          <div class="field">
+            <label for="fCity">City</label>
+            <input type="text" id="fCity" value="Surat" />
+          </div>
+          <div class="field">
+            <label for="fPhone">Phone</label>
+            <input type="text" id="fPhone" />
+          </div>
+          <div class="field">
+            <label for="fAltPhone">Alternate phone</label>
+            <input type="text" id="fAltPhone" />
+          </div>
+          <div class="field">
+            <label for="fEmail">Email</label>
+            <input type="email" id="fEmail" />
+          </div>
+          <div class="field">
+            <label for="fWebsite">Website (https://...)</label>
+            <input type="url" id="fWebsite" />
+          </div>
+          <div class="field">
+            <label for="fFacility">Facility type</label>
+            <select id="fFacility"></select>
+          </div>
+          <div class="field">
+            <label for="fPricing">Pricing</label>
+            <select id="fPricing"></select>
+          </div>
+          <div class="field field-full">
+            <label for="fTimings">Timings</label>
+            <input type="text" id="fTimings" placeholder="e.g. Mon-Sat 9 AM - 5 PM" />
+          </div>
+          <div class="field field-full">
+            <label>Services (select all that apply)</label>
+            <div class="chip-group" id="fServices"></div>
+          </div>
+          <div class="field field-full">
+            <label>Addiction types supported</label>
+            <div class="chip-group" id="fAddictions"></div>
+          </div>
+          <div class="field field-full">
+            <label>Gender supported</label>
+            <div class="chip-group" id="fGender"></div>
+          </div>
+          <div class="field field-full">
+            <label for="fSource">Source / reference URL</label>
+            <input type="text" id="fSource" placeholder="Where is this information from?" />
+          </div>
+          <div class="field field-full">
+            <label style="display:flex;gap:10px;align-items:center;cursor:pointer;font-weight:700">
+              <input type="checkbox" id="fVerified" style="accent-color:var(--green-600);width:17px;height:17px" />
+              Verified organisation
+            </label>
+          </div>
+        </div>
+        <span class="error-msg" id="ngoFormError"></span>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" id="ngoSaveBtn">Save Centre</button>
+          <button type="button" class="btn btn-outline" id="ngoCancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Request detail modal -->
+  <div class="modal-overlay" id="reqModal" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle">
+    <div class="modal">
+      <button type="button" class="modal-close" id="reqModalClose" aria-label="Close">&#10005;</button>
+      <h2 id="reqModalTitle">Enquiry Details</h2>
+      <div id="reqModalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

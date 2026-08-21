@@ -1,0 +1,32 @@
+{
+  "name": "break-free",
+  "version": "1.0.0",
+  "description": "Break Free - Addiction Support & NGO Connect Platform for Surat City (Educational College Project)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "seed": "node seed/seedNGOs.js"
+  },
+  "keywords": [
+    "addiction",
+    "support",
+    "ngo",
+    "surat",
+    "de-addiction",
+    "rehabilitation"
+  ],
+  "author": "Break Free Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "mongoose": "^8.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
