@@ -160,6 +160,26 @@ Then open:
 - Website: <http://localhost:5000>
 - Admin panel: <http://localhost:5000/admin/admin.html>
 
+### Deploying to Vercel
+
+The project is Vercel-ready:
+
+- `server/server.js` **exports** the Express app; `app.listen()` runs only when started directly (`npm start`) — never on Vercel.
+- `api/index.js` is the serverless entry: every `/api/*` request is routed to it by `vercel.json`, which also maps `/css`, `/js`, `/assets` and `/admin` to the static files in `public/`.
+- `server/config/db.js` caches the MongoDB connection across warm serverless invocations.
+
+Steps:
+
+1. Push this repo to GitHub.
+2. On <https://vercel.com> → **Add New Project** → import the repo (framework preset: **Other**).
+3. Add environment variables in **Settings → Environment Variables**:
+   - `MONGODB_URI` = your Atlas connection string
+   - `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`
+4. Deploy. Verify:
+   - `GET /api/config` returns JSON
+   - The form submits and results appear
+   - `/admin/admin.html` loads the dashboard
+
 ## 9. Database Seeding
 
 ```bash

@@ -1,6 +1,11 @@
 /**
  * server.js
- * Break Free - Express server entry point.
+ * Break Free - Express application.
+ *
+ * Works in TWO environments:
+ *  - Local development: `npm start` / `npm run dev` -> starts an HTTP server.
+ *  - Vercel (serverless): the app is EXPORTED and invoked per-request by
+ *    api/index.js. app.listen() never runs in that case.
  *
  * Serves:
  *   - the single-page public website (public/)
@@ -17,6 +22,10 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
+// Behind platforms like Vercel we sit behind a proxy - needed so that
+// rate limiting sees the real client IP.
+app.set('trust proxy', 1);
+
 // ---------- CORS ----------
 // In development we allow any origin; tighten this to your domain in production.
 app.use(
@@ -31,7 +40,8 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ---------- Static files ----------
-// The public website lives in /public and the admin panel in /public/admin.
+// Used in local development. In production Vercel serves these directly
+// as static assets (see vercel.json).
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ---------- API ----------
@@ -47,23 +57,28 @@ app.get('/api/health', (req, res) => {
 });
 
 // ---------- Errors ----------
+// Every unmatched route and every error returns JSON - never an HTML page.
 app.use(notFound);
 app.use(errorHandler);
 
-// ---------- Start ----------
-const PORT = process.env.PORT || 5000;
-
-(async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Break Free server running at http://localhost:${PORT}`);
-      console.log(`Admin panel at http://localhost:${PORT}/admin/admin.html`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err.message);
-    process.exit(1);
-  }
-})();
-
 module.exports = app;
+
+// ---------- Local development only ----------
+// This block runs ONLY when server.js is executed directly
+// (npm start / npm run dev). Vercel imports the module, so this is skipped.
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+
+  (async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`Break Free server running at http://localhost:${PORT}`);
+        console.log(`Admin panel at http://localhost:${PORT}/admin/admin.html`);
+      });
+    } catch (err) {
+      console.error('Failed to start server:', err.message);
+      process.exit(1);
+    }
+  })();
+}
